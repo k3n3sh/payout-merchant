@@ -1,0 +1,26 @@
+# Gradle
+*.iml
+.gradle
+/build
+build/
+/captures
+.externalNativeBuild
+.cxx
+
+# Local config
+local.properties
+/local.properties
+
+# IDE
+/.idea/
+.kotlin/
+
+# OS
+.DS_Store
+
+# Claude Code session data
+.claude/
+
+# Interview prep artefacts (do not publish)
+MerchantPayout_*.pdf
+MerchantPayout_*.html
