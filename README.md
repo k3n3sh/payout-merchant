@@ -1,5 +1,11 @@
 # Merchant Payout
 
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
+[![Compose](https://img.shields.io/badge/Jetpack%20Compose-2024.11-4285F4?logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
+[![Min SDK](https://img.shields.io/badge/minSdk-34-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
+[![Hilt](https://img.shields.io/badge/Hilt-2.53-orange)](https://dagger.dev/hilt/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A production-shaped Android reference implementation of a merchant balance & payout
 flow — the class of feature you'd find inside a real fintech app.
 
