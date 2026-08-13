@@ -237,6 +237,57 @@ and there's no on-disk state to migrate.
 
 ---
 
+## PCI DSS · applicability & mapping
+
+**Scope note.** This app moves *payouts* between merchant accounts — no
+cardholder data (PAN, CVV, magnetic-stripe) crosses this codebase. Strictly
+speaking, **PCI DSS applies to card data**, not to bank-account transfers, so
+the app itself is out of PCI scope. It is included here because the design
+uses the PCI DSS v4.0 controls as a rigour baseline — many fintechs voluntarily
+align mobile clients to the same controls where the underlying platform
+processes cards.
+
+For a mobile client that *does* handle card data, the requirements that
+land inside the app boundary are 2, 3, 4, 6, 8, 10, 11. This codebase's
+current posture mapped against them:
+
+| PCI DSS v4.0 · req | Applies to a mobile client as | Status in this codebase |
+|---|---|---|
+| **2** Secure defaults | No debug flags in release, `usesCleartextTraffic="false"`, minSdk pinned | ✅ debug logging only, no cleartext, minSdk 34 |
+| **3** Protect stored account data | No PAN / CHD stored, no unencrypted cache, no analytics egress | ✅ no on-disk state, no SDK data leaks |
+| **4** Protect data in transit | TLS-only, strong cipher suites, certificate pinning | 🟡 TLS enforced by OkHttp defaults · pinning is a roadmap item |
+| **6** Secure development | Static analysis, dependency scanning, no unsafe reflection | 🟡 lint + KSP · SBOM + Dependabot pending |
+| **8** Identify + authenticate | Biometric SCA, no shared credentials, session bound to auth | ✅ Class 3 biometric on material payouts · session nonce is roadmap |
+| **10** Log + monitor | No PII in analytics, redaction layer at telemetry boundary | ✅ zero third-party analytics · logs stripped in release |
+| **11** Test security | Regular pen-test, static analysis in CI, dependency CVE scan | 🟡 unit tests + `assembleDebug` clean · CI security jobs pending |
+
+Legend: ✅ shipped in this repo · 🟡 on the roadmap above · red items would
+be blockers if this were the actual production build.
+
+### Adjacent regimes worth naming
+
+- **PSD2 · Strong Customer Authentication (SCA).** Biometric step-up on
+  ≥ £1,000 is the SCA "inherence" factor. Combined with device possession
+  it's already 2-of-3 factors. Full compliance would add a knowledge factor
+  fallback (PIN) and dynamic linking of the auth token to amount + payee.
+- **Open Banking / PSD2 Payment Initiation.** The payout request already
+  carries a stable `device_id`; extending to a full JWS-signed payment
+  initiation request is the roadmap item under *Request signing*.
+- **UK FCA CP19/28 · Operational Resilience.** No third-party SDKs = no
+  vendor outage risk in the client path.
+- **GDPR / DPA 2018.** No PII on disk, no third-party analytics, no
+  cross-border data egress — data-minimisation by construction.
+- **European Accessibility Act 2025 (EAA).** WCAG 2.2 AA compliance is
+  called out in the roadmap; mandatory for financial services in the EU
+  from June 2025.
+
+The one-line answer to *"is this PCI DSS compliant?"*: **the client-side
+controls that a PCI DSS Level 1 program would require are either shipped or
+on the mapped roadmap; the rest are server + operations + audit concerns
+that live outside a mobile codebase.**
+
+---
+
 ## Testing approach
 
 Pure domain code is exercised in isolation with no Android or Robolectric
